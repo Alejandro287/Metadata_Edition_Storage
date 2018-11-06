@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.view.FXMLDocumnetController">
+   <children>
+      <AnchorPane prefHeight="95.0" prefWidth="1200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane layoutX="1036.0" prefHeight="81.0" prefWidth="177.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <ImageView fitHeight="89.0" fitWidth="161.0" layoutY="-6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="34.0" AnchorPane.topAnchor="-6.0">
+                     <image>
+                        <Image url="@../../escudoUnal_black.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutY="74.0" prefHeight="626.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <TabPane prefHeight="626.0" prefWidth="1200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <tabs>
+                <Tab text="Image Metadata Manager">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <SplitPane dividerPositions="0.31969949916527546" layoutY="2.0" prefHeight="596.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="595.0" prefWidth="395.0">
+                                       <children>
+                                          <SplitPane dividerPositions="0.6475548060708263" layoutX="70.0" layoutY="1.0" orientation="VERTICAL" prefHeight="326.0" prefWidth="304.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <items>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                                   <children>
+                                                      <AnchorPane fx:id="anchorImageView" layoutX="10.0" layoutY="10.0" prefHeight="260.0" prefWidth="399.0" AnchorPane.bottomAnchor="111.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                                         <children>
+                                                            <ImageView fx:id="imageView" fitHeight="237.0" fitWidth="399.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                      <AnchorPane layoutY="286.0" prefHeight="95.0" prefWidth="419.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="286.0">
+                                                         <children>
+                                                            <Button layoutX="27.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="150.0" text="Edit Metadata" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="27.0" />
+                                                            <Button layoutX="237.0" layoutY="13.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="150.0" text="Upload Image" AnchorPane.bottomAnchor="13.0" AnchorPane.rightAnchor="27.0" />
+                                                            <Button layoutX="26.0" layoutY="20.0" mnemonicParsing="false" onAction="#handleFileChooser" prefHeight="25.0" prefWidth="150.0" text="Browse Image" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="26.0" />
+                                                            <Button layoutX="240.0" layoutY="56.0" mnemonicParsing="false" onAction="#handleDirectoryChooser" prefHeight="25.0" prefWidth="150.0" text="Browse Folder" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="27.0" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </children>
+                                                </AnchorPane>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                                   <children>
+                                                      <ScrollPane layoutX="14.0" layoutY="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      <TreeView fx:id="treeView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                            </items>
+                                          </SplitPane>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="590.0" prefWidth="542.0">
+                                       <children>
+                                          <TitledPane layoutX="8.0" layoutY="7.0" prefHeight="200.0" prefWidth="200.0" text="Metadata" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <content>
+                                                <AnchorPane prefHeight="200.0" prefWidth="735.0">
+                                                   <children>
+                                                      <ScrollPane layoutX="9.600000381469727" layoutY="9.600000381469727" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      <TabPane layoutX="19.6" layoutY="18.6" prefHeight="550.0" prefWidth="770.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <tabs>
+                                                          <Tab text="XMP">
+                                                               <content>
+                                                                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                                                     <children>
+                                                                        <TabPane layoutX="7.0" layoutY="6.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                          <tabs>
+                                                                            <Tab text="Camara">
+                                                                                 <content>
+                                                                                    <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                                                                                 </content>
+                                                                              </Tab>
+                                                                            <Tab text="Untitled Tab 2" />
+                                                                          </tabs>
+                                                                        </TabPane>
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                               </content>
+                                                            </Tab>
+                                                          <Tab text="File Type">
+                                                               <content>
+                                                                  <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                                                               </content>
+                                                            </Tab>
+                                                            <Tab text="Exif IFD0">
+                                                              <content>
+                                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                              </content>
+                                                            </Tab>
+                                                            <Tab text="Exif SubIFD">
+                                                              <content>
+                                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                              </content>
+                                                            </Tab>
+                                                            <Tab text="GPS">
+                                                              <content>
+                                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                              </content>
+                                                            </Tab>
+                                                        </tabs>
+                                                      </TabPane>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                          </TitledPane>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                <Tab text="Database">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

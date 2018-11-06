@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+import javax.swing.Popup;
+
 import org.apache.commons.imaging.ImageFormats;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
@@ -61,19 +64,33 @@ import com.drew.metadata.xmp.XmpDirectory;
 
 public class MetadataManager {
 	
+	
+	//Funcion para mostrar metadatos de la imagen seleccionada del pc del usuario 
+	//Input: fielpath - Es el String que describe la direccion del archivo en el PC
+	//Output: MetadataStr - Es un String dodne se muestran los metadatos contenidos en la imagen
+	
+	/*
+	 * Mejoras: Cuando se lean los metadatos guardarlos en una HashMap 
+	 * - para los XML hacer 2 niveles de HashMap 
+	 * - Hacer HashMap de Directorios que contengan HashMap de Tags 
+	 * - Hacer que los keys sean tanto los nombres como el valor hexadecimal
+	 * - Hacer otra funcion de readMetadata, dejando esta para utilizar solo al cargar la imagen 
+	 *    y dejando la otra para no hacer todo el proceso de nuevo y en su lugar modificar directamnete los HashMaps
+	 */
 	public static String readMetadata(String filePath) throws ImageProcessingException, IOException, XMPException {
 		
-		File file = new File(filePath);
+		File file = new File(filePath); 
 		
 		DataInputStream stream = new DataInputStream(new FileInputStream(file));
-		Metadata metadata = ImageMetadataReader.readMetadata(stream);
+		Metadata metadata = ImageMetadataReader.readMetadata(stream); //Se obtienen metadatos de la imagen por medio de la libreria metadata-extractor
 		
 		stream.close();
 		
-		String metadataStr = "";
+		String metadataStr = ""; //se crea String donde se almacenaran todos los metadatos 
 		
+		
+		// Se realiza este for leer metadatos del directorio XMP
 		for (Directory directory : metadata.getDirectories()) {
-					
 					if (directory.getName() == "XMP") {
 			    		Collection<XmpDirectory> xmpDirectories = metadata.getDirectoriesOfType(XmpDirectory.class);
 			    		for (XmpDirectory xmpDirectory : xmpDirectories) {
@@ -82,11 +99,12 @@ public class MetadataManager {
 			    		    while (iterator.hasNext()) {
 			    		        XMPPropertyInfo xmpPropertyInfo = (XMPPropertyInfo)iterator.next();
 			    		        
+			    		        //Almacenar metadatos XMP en un String
 			    		        if (xmpPropertyInfo.getValue() != null && xmpPropertyInfo.getValue() != "") {
 			    		        
-				    		        System.out.format("[%s] - %s = %s",
-				    			            directory.getName(), xmpPropertyInfo.getPath(), xmpPropertyInfo.getValue());
-				    			    System.out.print("\n");
+				    		        System.out.format("[%s] - %s = %s",//Quitar al finalizar
+				    			            directory.getName(), xmpPropertyInfo.getPath(), xmpPropertyInfo.getValue());//Quitar al finalizar
+				    			    System.out.print("\n");//Quitar al finalizar
 				    			    
 				    			    metadataStr += "\n["+ directory.getName()+"] - "+ xmpPropertyInfo.getPath()+" = "+xmpPropertyInfo.getValue();
 			    		        }
@@ -96,12 +114,13 @@ public class MetadataManager {
 			    		continue;
 			    	}
 					
+					//Almacenar metadatos en un String
 				    for (Tag tag : directory.getTags()) {
 				    	
 				    	metadataStr += "\n["+ directory.getName()+"] - "+ tag.getTagName()+" = "+tag.getDescription();
-				        System.out.format("[%s] - %s = %s",
-				            directory.getName(), tag.getTagName(), tag.getDescription());
-				        System.out.print("\n");
+				        System.out.format("[%s] - %s = %s",  //Quitar al finalizar
+				            directory.getName(), tag.getTagName(), tag.getDescription()); //Quitar al finalizar
+				        System.out.print("\n"); //Quitar al finalizar
 				    }
 			}
 		
@@ -109,7 +128,17 @@ public class MetadataManager {
 	}
 	
 	
+	//Input: fielpath - Es el String que describe la direccion del archivo en el PC
+	//		 newDirectory - String del nombre del directorio 
+	//	 	 newTag - String del nombre del tag
+	//		 NewDescription - String de la descripcion del tag
 	
+	/*
+	 * Mejoras: Pasar como input un HashMap de metadatos que se crea en readMetadata
+	 * - No leer de nuevo los metadatos con la libreria metadata-extractor.
+	 * - Intentar hacer la edicion sin librerias
+	 * 
+	 */
 	public static void edit(String filePath, String newDirectory, String newTag, String newDescription) throws ImageProcessingException, IOException, ImageWriteException, ImageReadException, XMPException {
 		
 		File file = new File(filePath);
@@ -119,19 +148,21 @@ public class MetadataManager {
 		Metadata metadata = ImageMetadataReader.readMetadata(stream);
 		
 		
-		System.out.println("System.out.println(metadata.toString());");
-		System.out.println(metadata.toString());
+		System.out.println("System.out.println(metadata.toString());");//Quitar al finalizar
+		System.out.println(metadata.toString());//Quitar al finalizar
 
         String imageType = null; 
         stream.close();
         
+        //Buscar en metadatos el tipo de imagen que se tiene
+        //Reemplazar por busqueda en HashMap
         for (Directory directory : metadata.getDirectories()) {
         	if(directory.getName().equals("File Type")) {
         		for (Tag tag : directory.getTags()) {
         			if (tag.getTagName().equals("Detected File Type Name")) {
         				imageType = tag.getDescription();
-        				System.out.println("Image Type:");
-        				System.out.println(imageType);
+        				System.out.println("Image Type:");//Quitar al finalizar
+        				System.out.println(imageType);//Quitar al finalizar
         				
         				break;
         			}
@@ -144,21 +175,32 @@ public class MetadataManager {
 		boolean containsDirectory = false;  
 		boolean containsTag = false; 
 		
+		//Buscar en dirctorios
+		//*Remplazar todas las busquedas por HashMap
 		for (Directory directory : metadata.getDirectories()) {			
-			if (directory.getName().equals(newDirectory)) {
-				System.out.println("directory.getName()");
-				System.out.println(directory.getName());
+			if (directory.getName().equals(newDirectory)) { //Existe directorio
+				System.out.println("directory.getName()");  //Quitar al finalizar
+				System.out.println(directory.getName());  //Quitar al finalizar
 				
+				//Buscar en Tags de este directorio
 				for (Tag tag : directory.getTags()) {				
-					if (tag.getTagName().equals(newTag)) {
-						System.out.println("tag.getTagName()");
-						System.out.println(tag.getTagName());
+					if (tag.getTagName().equals(newTag)) { //Existe Tag en ese directorio existente
+						System.out.println("tag.getTagName()"); //Quitar al finalizar
+						System.out.println(tag.getTagName()); //Quitar al finalizar
 						
+						//Comparar valor de int entre el Tag de libreria metadata-extractor y
+						// los valores hexadecimales de la libreria apache-commons-imaging
+						// Esto se realiza para hacer el empalme entre las dos librerias sin confusion
+						
+						/*
+						 * Mejorar: hacer HashMap de emplame de Tags al hacer readMatadata
+						 * - Solucionar casos donde no exsita equivalencia en Int de tags 
+						 */
 						if (directory.getName().equals("GPS")) {
 							for (TagInfo tagInfo : GpsTagConstants.ALL_GPS_TAGS) {
 								if(tag.getTagType() == tagInfo.tag) {
-									System.out.println("tagInfo.tag");
-									System.out.println(tagInfo.tag);
+									System.out.println("tagInfo.tag"); //Quitar al finalizar
+									System.out.println(tagInfo.tag); //Quitar al finalizar
 									
 									change(file, imageType, tagInfo.tag, newDescription, tagInfo);
 									break;
@@ -167,17 +209,19 @@ public class MetadataManager {
 						}else if(directory.getName().equals("Exif SubIFD")) {
 							for (TagInfo tagInfo : ExifTagConstants.ALL_EXIF_TAGS) {
 								if(tag.getTagType() == tagInfo.tag) {
-									System.out.println("tagInfo.tag");
-									System.out.println(tagInfo.tag);
+									System.out.println("tagInfo.tag"); //Quitar al finalizar
+									System.out.println(tagInfo.tag); //Quitar al finalizar
 									
 									change(file, imageType, tagInfo.tag, newDescription, tagInfo);
 									break;
+								
+								//hay una diferencia entre los numeros de este tag para las diferentes librerias
+								// por eso se hace una conversion para que haya equivalencia
 								}else if (tag.getTagType() == 37393){
 									
-									System.out.println("tagInfo.tag");
-									System.out.println(tagInfo.tag);
-									
-									//tagInfo.tag = 41489 
+									System.out.println("tagInfo.tag"); //Quitar al finalizar
+									System.out.println(tagInfo.tag); //Quitar al finalizar
+						
 									change(file, imageType, 41489, newDescription, ExifTagConstants.EXIF_TAG_IMAGE_NUMBER);
 									break;
 								}
@@ -185,8 +229,8 @@ public class MetadataManager {
 						}else if(directory.getName().equals("Exif IFD0")) {
 							for (TagInfo tagInfo : TiffTagConstants.ALL_TIFF_TAGS) {
 								if(tag.getTagType() == tagInfo.tag) {
-									System.out.println("tagInfo.tag");
-									System.out.println(tagInfo.tag);
+									System.out.println("tagInfo.tag"); //Quitar al finalizar
+									System.out.println(tagInfo.tag); //Quitar al finalizar
 									
 									change(file, imageType, tagInfo.tag, newDescription, tagInfo);
 									break;
@@ -198,10 +242,18 @@ public class MetadataManager {
 						break;
 					}
 					
-					if (!containsTag) {
-						// Pendiente
-					}
 				}
+				
+				// Caso en donde no exitse Tag especificado pero si directorio
+				// se debe crear el Tag en el directorio especificado si es posible 
+				// de lo contrario hacer PopUp de que no es posible.
+				// Solo aplica para directorios no creados por usuario en XMP
+				if (!containsTag) {
+					// Pendiente
+					
+					JOptionPane.showMessageDialog(null, "It is not possible to create a new Tag in this directory.","Warning", JOptionPane.ERROR_MESSAGE);
+				}
+				
 				containsDirectory = true; 
 				break;
 			}
@@ -209,109 +261,72 @@ public class MetadataManager {
 			
 		}
 		
-		System.out.println("containsDirectory");
-		System.out.println(containsDirectory);
+		System.out.println("containsDirectory");  //Quitar al finalizar
+		System.out.println(containsDirectory); //Quitar al finalizar
 		
-		System.out.println("containsTag");
-		System.out.println(containsTag);
+		System.out.println("containsTag"); //Quitar al finalizar
+		System.out.println(containsTag); //Quitar al finalizar		
 		
-		/*if (!containsDirectory) {
-			
-			String xmpXml = Imaging.getXmpXml(file);
-			
-			System.out.println("xmpXml");
-			System.out.println(xmpXml);
-
-			
-			for (Directory directory : metadata.getDirectories()) {
-				
-				if (directory.getName() == "XMP") {
-		    		Collection<XmpDirectory> xmpDirectories = metadata.getDirectoriesOfType(XmpDirectory.class);
-		    		for (XmpDirectory xmpDirectory : xmpDirectories) {
-		    		    XMPMeta xmpMeta = xmpDirectory.getXMPMeta();
-		    		    XMPIterator iterator = xmpMeta.iterator();
-		    		    while (iterator.hasNext()) {
-		    		        XMPPropertyInfo xmpPropertyInfo = (XMPPropertyInfo)iterator.next();
-
-		    		        if (xmpPropertyInfo.getValue() != null && xmpPropertyInfo.getValue() != "") {
-			    		        
-			    		        if (xmpPropertyInfo.getPath().equals(newDirectory+":"+newTag)) {
-			    		        	if(!xmpPropertyInfo.getValue().equals(newDescription)) {
-			    		        		
-			    		        		String spliter = newDirectory+":"+newTag+"\""+xmpPropertyInfo.getValue()+"\""; 
-			    			            String[] parts = xmpXml.split(spliter);
-			    			            String union = parts[0]+newDirectory+":"+newTag+"\""+newDescription+"\"\n"+parts[1];
-			    			            
-			    			            TiffOutputSet outputSet = outputSetType (file,imageType);
-			    			    		save(outputSet, file, imageType, union);
-			    		        	}
-			    		        	containsDirectory = true; 
-			    		        	break;
-			    		        }
-		    		        }
-		    		    }
-		    		 }
-		    		
-		    		 break;
-		    	 }
-		     }
-	    }*/
-		
+		//Caso donde no se encontro Directorio existente o pertenezca a subdirectorio de XMP
 		if (!containsDirectory) {
-			
-			String xmpXml = Imaging.getXmpXml(file);
-			
-			
-			//XMPMeta newXMP = XMPMetaFactory.create();
-			
-			//XMPMeta oldXMP = XMPMetaFactory.parse(inputstream);
-			XMPMeta oldXMP2 = XMPMetaFactory.parseFromString(xmpXml);
-			System.out.println(XMPMetaFactory.serializeToString(oldXMP2 , new SerializeOptions()));
-			//new XMPSchemaRegistryImpl().registerNamespace("http://ns.myname.com/Alejo/1.0/", "Alejo");
-			//newXMP.setProperty("http://ns.myname.com/Alejo/1.0/", "Alejo", "Claro que SI");
-			
-			
-			String spliter = "</rdf:Description>"; 
-			//String spliter = "\n >\n"; 
-            String[] parts = xmpXml.split(spliter);
-            //String union = parts[0]+"\n "+newDirectory+":"+newTag+"=\""+newDescription+"\""+spliter+parts[1];
-            String union = parts[0]+spliter+"\n<rdf:Description>\n"+"<"+newDirectory+":"+newTag+">"+newDescription+"</"+newDirectory+":"+newTag+">\n"+spliter+parts[1];
- 
-            String newXMPStr = "<?xpacket begin=\"ï»¿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\r\n" + 
-            "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 4.4.0\">\r\n" + 
-            "   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\r\n" + 
-            "      <rdf:Description rdf:about=\"\"\r\n" + 
-            "            xmlns:"+newDirectory+"=\"http://ns.myname.com/"+newDirectory+"/1.0/\">\r\n" + 
-            "         <"+newDirectory+":"+newTag+">"+newDescription+"</"+newDirectory+":"+newTag+">\r\n" + 
-            "      </rdf:Description>\r\n"+
-            "   </rdf:RDF>\r\n" + 
-            "</x:xmpmeta>\r\n"+
-            "<?xpacket end=\"w\"?>";
-            
-            
-            String adicion = "\n      <rdf:Description rdf:about=\"\"\r\n" + 
-            "            xmlns:Alejo=\"http://ns.myname.com/Alejo/1.0/\">\r\n" + 
-            "         <Alejo:Ganador>SIII</Alejo:Ganador>\r\n" + 
-            "      </rdf:Description>";
-            
-            //union = parts[parts.length-2]+spliter+adicion+parts[parts.length-1];
-            
-           
-            
-            XMPMeta newXMP = XMPMetaFactory.parseFromString(newXMPStr);
-            
-            //System.out.println(XMPMetaFactory.serializeToString(newXMP , new SerializeOptions()));
-            
-            XMPUtils.appendProperties(oldXMP2,newXMP, true, true, true);
-			
-			
-			union = XMPMetaFactory.serializeToString(newXMP , new SerializeOptions());
-			
-			 System.out.println("Union:");
-	         System.out.println(union);
-            
-            TiffOutputSet outputSet = outputSetType (file,imageType);
-    		save(outputSet, file, imageType, union);
+
+			int dialogButton = JOptionPane.YES_NO_OPTION;
+			int dialogResult = JOptionPane.showConfirmDialog (null, "Do you want to create or modify the directory \""+newDirectory+"\" with the tag \""+newTag+"\"?","Warning",dialogButton);
+			if(dialogResult == JOptionPane.YES_OPTION){
+				String xmpXml = Imaging.getXmpXml(file);
+				
+				
+				//XMPMeta newXMP = XMPMetaFactory.create();
+				
+				//XMPMeta oldXMP = XMPMetaFactory.parse(inputstream);
+				XMPMeta oldXMP2 = XMPMetaFactory.parseFromString(xmpXml);
+				System.out.println(XMPMetaFactory.serializeToString(oldXMP2 , new SerializeOptions()));
+				//new XMPSchemaRegistryImpl().registerNamespace("http://ns.myname.com/Alejo/1.0/", "Alejo");
+				//newXMP.setProperty("http://ns.myname.com/Alejo/1.0/", "Alejo", "Claro que SI");
+				
+				
+				/*String spliter = "</rdf:Description>"; 
+				//String spliter = "\n >\n"; 
+	            String[] parts = xmpXml.split(spliter);
+	            //String union = parts[0]+"\n "+newDirectory+":"+newTag+"=\""+newDescription+"\""+spliter+parts[1];
+	            String union = parts[0]+spliter+"\n<rdf:Description>\n"+"<"+newDirectory+":"+newTag+">"+newDescription+"</"+newDirectory+":"+newTag+">\n"+spliter+parts[1];*/
+	 
+	            String newXMPStr = "<?xpacket begin=\"ï»¿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\r\n" + 
+	            "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 4.4.0\">\r\n" + 
+	            "   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\r\n" + 
+	            "      <rdf:Description rdf:about=\"\"\r\n" + 
+	            "            xmlns:"+newDirectory+"=\"http://ns.myname.com/"+newDirectory+"/1.0/\">\r\n" + 
+	            "         <"+newDirectory+":"+newTag+">"+newDescription+"</"+newDirectory+":"+newTag+">\r\n" + 
+	            "      </rdf:Description>\r\n"+
+	            "   </rdf:RDF>\r\n" + 
+	            "</x:xmpmeta>\r\n"+
+	            "<?xpacket end=\"w\"?>";
+	            
+	            
+	            /*String adicion = "\n      <rdf:Description rdf:about=\"\"\r\n" + 
+	            "            xmlns:Alejo=\"http://ns.myname.com/Alejo/1.0/\">\r\n" + 
+	            "         <Alejo:Ganador>SIII</Alejo:Ganador>\r\n" + 
+	            "      </rdf:Description>";*/
+	            
+	            //union = parts[parts.length-2]+spliter+adicion+parts[parts.length-1];
+	            
+	           
+	            
+	            XMPMeta newXMP = XMPMetaFactory.parseFromString(newXMPStr);
+	            
+	            //System.out.println(XMPMetaFactory.serializeToString(newXMP , new SerializeOptions()));
+	            
+	            //XMPUtils.appendProperties(oldXMP2,newXMP, true, true, true);
+	            XMPUtils.appendProperties(newXMP,oldXMP2, true, true, true);
+	            
+				String union = XMPMetaFactory.serializeToString(oldXMP2 , new SerializeOptions());
+				
+				 System.out.println("Union:");  //Quitar al finalizar
+		         System.out.println(union);  //Quitar al finalizar
+	            
+	            TiffOutputSet outputSet = outputSetType (file,imageType);
+	    		save(outputSet, file, imageType, union);
+			}
 
 		}
 		

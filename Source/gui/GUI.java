@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -78,12 +80,10 @@ public class GUI extends JFrame{
     private JTextArea collectionTextArea;
     private JButton btnDatabaseInizialiter;
     private DatabaseInitializer DB;
-    private JTextField retrieveFilePath;
     private JTextField toJasonName;
-    private JTextField toJasonPath;
     
     public GUI(){
-    super("Alejandro Cano");
+    super("Metadata Manager");
     button = new JButton("Browse Image");
     button.setBounds(10,330,500,40);
     label = new JLabel();
@@ -97,8 +97,8 @@ public class GUI extends JFrame{
         public void actionPerformed(ActionEvent e) {
         
           JFileChooser file = new JFileChooser();
-          //file.setCurrentDirectory(new File(System.getProperty("user.home")));
-          file.setCurrentDirectory(new File("C:\\Users\\Alejandro\\OneDrive - Universidad Nacional de Colombia\\Documents\\Universidad - Mecatrónica\\Semestre 10\\Proyecto Sofrony\\Imagenes Pruebas\\Prueba"));
+          file.setCurrentDirectory(new File(System.getProperty("user.home")));
+          //file.setCurrentDirectory(new File("C:\\Users\\Alejandro\\OneDrive - Universidad Nacional de Colombia\\Documents\\Universidad - Mecatrónica\\Semestre 10\\Proyecto Sofrony\\Imagenes Pruebas\\Prueba"));
          
           //filter the files
           FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg","gif","png","TIF");
@@ -232,40 +232,87 @@ public class GUI extends JFrame{
     
     btnRetrieveImageFrom = new JButton("Retrieve Image from DB");
     btnRetrieveImageFrom.addActionListener(new ActionListener() {
+    	
     	public void actionPerformed(ActionEvent e) {
-    		ImageWriter.retrieve(retrieveFileName.getText(),retrieveFilePath.getText());
+    			
+    		JFileChooser file = new JFileChooser ();
     		
-    		File selectedFile = new File (retrieveFilePath.getText());
-            String path = selectedFile.getAbsolutePath();
-            GUI.pathFile = retrieveFilePath.getText(); 
-            String extension = getFileExtension(selectedFile);
-            if (extension.equals("TIF")) {
-		    	  try {
-		              final BufferedImage tif = ImageIO.read(selectedFile);
-		              File minImage = new File ("minImage.png"); 
-		              ImageIO.write(tif, "png", minImage);
-		  			  path = minImage.getAbsolutePath();
-		  			  label.setIcon(ResizeImage(path));
-		              new File (path).delete();
-				  } catch (IOException e1) {
-					  e1.printStackTrace();
-				  }
-            }else {
-          	  label.setIcon(ResizeImage(path));
-            }
+    		file.setCurrentDirectory(new File(System.getProperty("user.home")));
+    		//file.setCurrentDirectory(new File("C:\\Users\\Alejandro\\OneDrive - Universidad Nacional de Colombia\\Documents\\Universidad - Mecatrónica\\Semestre 10\\Proyecto Sofrony\\Imagenes Pruebas\\Prueba"));
+    		//file.showSaveDialog(null);
+	         
+	          //filter the files
+	          FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg","gif","png","TIF");
+	          file.addChoosableFileFilter(filter);
+	          int result = file.showSaveDialog(null);
+	           //if the user click on save in Jfilechooser
+	          if(result == JFileChooser.APPROVE_OPTION){
+	              File selectedFile = file.getSelectedFile();
+	              String path = selectedFile.getAbsolutePath();
+	              
+	              //Path path_Path = Paths.get(fullPath);
+	              //String path = path_Path.getParent().toString();
+	              
+	              ImageWriter.retrieve(retrieveFileName.getText(), path);
+		      	
+	              GUI.pathFile = path; 
+	              String extension = getFileExtension(selectedFile);
+	              if (extension.equals("TIF")) {
+	  		    	  try {
+	  		              final BufferedImage tif = ImageIO.read(selectedFile);
+	  		              File minImage = new File ("minImage.png"); 
+	  		              ImageIO.write(tif, "png", minImage);
+	  		  			  path = minImage.getAbsolutePath();
+	  		  			  label.setIcon(ResizeImage(path));
+	  		              new File (path).delete();
+	  				  } catch (IOException e1) {
+	  					  e1.printStackTrace();
+	  				  }
+	              }else {
+	            	  label.setIcon(ResizeImage(path));
+	              }
+	              
+	              
+	              /**ImageWriter.retrieve(retrieveFileName.getText(),retrieveFilePath.getText());
+	      		
+	      		  File selectedFile = new File (retrieveFilePath.getText());
+	              String path = selectedFile.getAbsolutePath();
+	              GUI.pathFile = retrieveFilePath.getText(); 
+	              String extension = getFileExtension(selectedFile);
+	              if (extension.equals("TIF")) {
+	  		    	  try {
+	  		              final BufferedImage tif = ImageIO.read(selectedFile);
+	  		              File minImage = new File ("minImage.png"); 
+	  		              ImageIO.write(tif, "png", minImage);
+	  		  			  path = minImage.getAbsolutePath();
+	  		  			  label.setIcon(ResizeImage(path));
+	  		              new File (path).delete();
+	  				  } catch (IOException e1) {
+	  					  e1.printStackTrace();
+	  				  }
+	              }else {
+	            	  label.setIcon(ResizeImage(path));
+	              }*/
+ 
+	          }
+	           //if the user click on save in Jfilechooser
+	          else if(result == JFileChooser.CANCEL_OPTION){
+	              System.out.println("No File Select");
+	          }
+		
     	}
     });
-    btnRetrieveImageFrom.setBounds(10, 518, 160, 40);
+    btnRetrieveImageFrom.setBounds(10, 564, 160, 40);
     getContentPane().add(btnRetrieveImageFrom);
     
     retrieveFileName = new JTextField();
-    retrieveFileName.setBounds(180, 528, 134, 30);
+    retrieveFileName.setBounds(180, 574, 134, 30);
     getContentPane().add(retrieveFileName);
     retrieveFileName.setColumns(10);
     
-    lblFileName = new JLabel("File Name");
+    lblFileName = new JLabel("File Name to search");
     lblFileName.setHorizontalAlignment(SwingConstants.CENTER);
-    lblFileName.setBounds(213, 503, 69, 14);
+    lblFileName.setBounds(195, 549, 105, 14);
     getContentPane().add(lblFileName);
     
     label_2 = new JLabel("METADATA");
@@ -307,49 +354,82 @@ public class GUI extends JFrame{
     lblDatabasejsonFormat.setBounds(613, 215, 231, 30);
     getContentPane().add(lblDatabasejsonFormat);
     
-    JLabel lblFilePathDirectory = new JLabel("File path directory");
-    lblFilePathDirectory.setHorizontalAlignment(SwingConstants.CENTER);
-    lblFilePathDirectory.setBounds(357, 503, 120, 14);
-    getContentPane().add(lblFilePathDirectory);
-    
-    retrieveFilePath = new JTextField();
-    retrieveFilePath.setColumns(10);
-    retrieveFilePath.setBounds(324, 528, 186, 30);
-    getContentPane().add(retrieveFilePath);
-    
     JButton btnItemFromDb = new JButton("DB item to JSON File");
     btnItemFromDb.addActionListener(new ActionListener() {
     	public void actionPerformed(ActionEvent e) {
-    		JsonWriter.toJson(toJasonName.getText(),toJasonPath.getText());
+    		
+    		JFileChooser file = new JFileChooser ();
+    		
+    		file.setCurrentDirectory(new File(System.getProperty("user.home")));
+    		//file.setCurrentDirectory(new File("C:\\Users\\Alejandro\\OneDrive - Universidad Nacional de Colombia\\Documents\\Universidad - Mecatrónica\\Semestre 10\\Proyecto Sofrony\\Imagenes Pruebas\\Prueba"));
+    		//file.showSaveDialog(null);
+	         
+	          //filter the files
+	          FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg","gif","png","TIF");
+	          file.addChoosableFileFilter(filter);
+	          int result = file.showSaveDialog(null);
+	           //if the user click on save in Jfilechooser
+	          if(result == JFileChooser.APPROVE_OPTION){
+	              File selectedFile = file.getSelectedFile();
+	              String path = selectedFile.getAbsolutePath();
+	              
+	              //Path path_Path = Paths.get(fullPath);
+	              //String path = path_Path.getParent().toString();
+	              
+	              JsonWriter.toJson(toJasonName.getText(),path);
+
+	          }
+	           //if the user click on save in Jfilechooser
+	          else if(result == JFileChooser.CANCEL_OPTION){
+	              System.out.println("No File Select");
+	          }
+
     	}
     });
-    btnItemFromDb.setBounds(10, 584, 160, 40);
+    btnItemFromDb.setBounds(10, 630, 160, 40);
     getContentPane().add(btnItemFromDb);
     
     toJasonName = new JTextField();
     toJasonName.setColumns(10);
-    toJasonName.setBounds(180, 594, 134, 30);
+    toJasonName.setBounds(180, 640, 134, 30);
     getContentPane().add(toJasonName);
     
-    JLabel lblItemName = new JLabel("Item Name");
+    JLabel lblItemName = new JLabel("Item Name to search");
     lblItemName.setHorizontalAlignment(SwingConstants.CENTER);
-    lblItemName.setBounds(213, 569, 69, 14);
+    lblItemName.setBounds(195, 615, 105, 14);
     getContentPane().add(lblItemName);
-    
-    JLabel label_4 = new JLabel("File path directory");
-    label_4.setHorizontalAlignment(SwingConstants.CENTER);
-    label_4.setBounds(357, 569, 120, 14);
-    getContentPane().add(label_4);
-    
-    toJasonPath = new JTextField();
-    toJasonPath.setColumns(10);
-    toJasonPath.setBounds(324, 594, 186, 30);
-    getContentPane().add(toJasonPath);
     
     JButton btnDbToJson = new JButton("Entire DB to JSON File");
     btnDbToJson.addActionListener(new ActionListener() {
     	public void actionPerformed(ActionEvent e) {
-    		JsonWriter.allToJson(toJasonPath.getText());
+    		
+    		
+    		
+    		JFileChooser file = new JFileChooser ();
+    		
+    		file.setCurrentDirectory(new File(System.getProperty("user.home")));
+    		//file.setCurrentDirectory(new File("C:\\Users\\Alejandro\\OneDrive - Universidad Nacional de Colombia\\Documents\\Universidad - Mecatrónica\\Semestre 10\\Proyecto Sofrony\\Imagenes Pruebas\\Prueba"));
+    		//file.showSaveDialog(null);
+	         
+	          //filter the files
+	          FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg","gif","png","TIF");
+	          file.addChoosableFileFilter(filter);
+	          int result = file.showSaveDialog(null);
+	           //if the user click on save in Jfilechooser
+	          if(result == JFileChooser.APPROVE_OPTION){
+	              File selectedFile = file.getSelectedFile();
+	              String path = selectedFile.getAbsolutePath();
+	              
+	              //Path path_Path = Paths.get(fullPath);
+	              //String path = path_Path.getParent().toString();
+	              
+	              JsonWriter.allToJson(path);
+	          }
+	           //if the user click on save in Jfilechooser
+	          else if(result == JFileChooser.CANCEL_OPTION){
+	              System.out.println("No File Select");
+	          }
+
     	}
     });
     btnDbToJson.setBounds(324, 635, 186, 35);

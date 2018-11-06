@@ -1,5 +1,9 @@
 package archivos;
 
+import java.util.Set;
+
+import javax.swing.JOptionPane;
+
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
@@ -19,13 +23,54 @@ public class DatabaseInitializer {
 	public DatabaseInitializer() {};
 	
 	public DatabaseInitializer(String nameDB, String nameCollection) {
+			
 		DatabaseInitializer.mongoClient = new MongoClient();
-		DatabaseInitializer.db = mongoClient.getDatabase(nameDB);
-		db.drop();
-		DatabaseInitializer.collection = db.getCollection(nameCollection);
-	    collection.drop();
+		
+		boolean DBexist = false;
+		boolean collectionExist = false;
+		
+		MongoCursor<String> dbsCursor = mongoClient.listDatabaseNames().iterator();
+		while(dbsCursor.hasNext()) {
+			if (dbsCursor.next().equals(nameDB)) {
+				DBexist = true;
+				break;
+			}
+		}
+		
+		if (!DBexist) {
+			int dialogButton = JOptionPane.YES_NO_OPTION;
+			int dialogResult = JOptionPane.showConfirmDialog (null, "Do you want to create a new database called "+nameDB+"?","Warning",dialogButton);
+			if(dialogResult == JOptionPane.YES_OPTION){
+				DatabaseInitializer.db = mongoClient.getDatabase(nameDB);
+				//db.drop();
+			}
+		}else {
+			DatabaseInitializer.db = mongoClient.getDatabase(nameDB);
+			//db.drop();
+		}
+		
+		MongoCursor<String> collectionNames = db.listCollectionNames().iterator();
+		while(collectionNames.hasNext()) {
+			if (collectionNames.next().equals(nameCollection)) {
+				collectionExist = true;
+				break;
+			}
+		}
+		
+		if (!collectionExist) {
+			int dialogButton = JOptionPane.YES_NO_OPTION;
+			int dialogResult = JOptionPane.showConfirmDialog (null, "Do you want to create a new collection called "+nameCollection+"?","Warning",dialogButton);
+			if(dialogResult == JOptionPane.YES_OPTION){
+				DatabaseInitializer.collection = db.getCollection(nameCollection);
+			    //collection.drop();
+			}
+		}else {
+			DatabaseInitializer.collection = db.getCollection(nameCollection);
+		    //collection.drop();
+		}
+		
 	    DatabaseInitializer.gridFSBucket = GridFSBuckets.create(db, nameCollection+"GridFS");
-	    gridFSBucket.drop();
+	    //gridFSBucket.drop();
 	}
 	
 	
